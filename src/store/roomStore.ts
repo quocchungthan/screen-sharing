@@ -5,6 +5,8 @@ export interface Participant {
   username: string;
   isMuted: boolean;
   isSharing: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  signal: any;
 }
 
 interface RoomState {

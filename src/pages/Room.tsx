@@ -1,16 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Mic, MicOff, Share2, StopCircle, Users, X, UserCheck } from 'lucide-react';
+import { Mic, MicOff, Share2, StopCircle, Users, X } from 'lucide-react';
 import { useUserStore } from '../store/userStore';
 import { useRoomStore } from '../store/roomStore';
-import { initializeSocketEvents, disconnect } from '../services/socket';
-import { 
-  initializeMedia, 
-  toggleMicrophone, 
-  startScreenShare, 
-  stopScreenShare, 
-  cleanup 
-} from '../services/webrtc';
+import { initializeSocketEvents, disconnect, cleanup, initializeMedia, startScreenShare, stopScreenShare, toggleMicrophone } from '../services/socket';
 import ParticipantsList from '../components/ParticipantsList';
 
 const Room: React.FC = () => {
@@ -56,7 +49,7 @@ const Room: React.FC = () => {
     // Clean up when component unmounts
     return () => {
       cleanup();
-      disconnect();
+    //   disconnect();
     };
   }, [roomId, username, navigate, setRoomId, isMuted]);
   
