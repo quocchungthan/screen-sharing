@@ -73,6 +73,11 @@ const Entry: React.FC = () => {
           <div className="flex space-x-4">
             <button
               type="button"
+			  style={{
+				justifyContent: "center",
+				alignItems: "center",
+				display: "flex"
+			  }}
               className={`flex-1 btn ${isCreating ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setIsCreating(true)}
             >
@@ -81,6 +86,11 @@ const Entry: React.FC = () => {
             </button>
             <button
               type="button"
+			  style={{
+				justifyContent: "center",
+				alignItems: "center",
+				display: "flex"
+			  }}
               className={`flex-1 btn ${!isCreating ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setIsCreating(false)}
             >
