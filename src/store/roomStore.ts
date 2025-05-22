@@ -6,7 +6,7 @@ export interface Participant {
   isMuted: boolean;
   isSharing: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  signal: any;
+  signal: any; // or specific type if known
 }
 
 interface RoomState {
@@ -14,6 +14,7 @@ interface RoomState {
   participants: Participant[];
   setRoomId: (id: string) => void;
   addParticipant: (participant: Participant) => void;
+  setParticipants: (participants: Participant[]) => void;
   updateParticipant: (id: string, updates: Partial<Participant>) => void;
   removeParticipant: (id: string) => void;
   reset: () => void;
@@ -22,6 +23,11 @@ interface RoomState {
 export const useRoomStore = create<RoomState>((set) => ({
   roomId: null,
   participants: [],
+  setParticipants: (participants: Participant[]) => 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	set((state) => ({
+      participants: [...participants]
+    })),
   
   setRoomId: (id) => set({ roomId: id }),
   

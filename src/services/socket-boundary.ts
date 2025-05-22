@@ -11,12 +11,9 @@ const createSocketClient = (clientId: string): ISocketClient => {
 	logCBT('Initializing Ably Realtime client', { clientId });
 
 	const ably = new Ably.Realtime({ key: ABLY_API_KEY, clientId });
-	const roomId = window.location.pathname.split("/room/")[1] || uuidv4();
-	logCBT('Using room ID', { roomId });
 
 	const subjectsMap: { [key: string]: SubscriptionLike } = {};
-	const channel: Ably.RealtimeChannel = ably.channels.get(`room-${roomId}`);
-	logCBT('Channel initialized', { channelName: `room-${roomId}` });
+	let channel: Ably.RealtimeChannel;
 
 	const listenToEvent = <TPayload>(channel: Ably.RealtimeChannel, eventName: string) => {
 		if (subjectsMap[eventName]) return;
@@ -33,6 +30,10 @@ const createSocketClient = (clientId: string): ISocketClient => {
 	};
 
 	return {
+		enterRoom: (roomId: string) => {
+ 			channel = ably.channels.get(`room-${roomId}`);
+			logCBT('Channel initialized', { channelName: `room-${roomId}` });
+		},
 		emit: <T>(eventName: string, data: T) => {
 			logCBT(`Emitting event '${eventName}'`, data);
 			channel.publish(eventName, data);
@@ -54,6 +55,7 @@ export interface ISocketClient {
 	emit<T>(eventName: string, data: T): void;
 	listen<T>(eventName: string): Observable<T>;
 	disconnect(): void;
+	enterRoom(roomId: string): void;
 }
 
 // --- Export Instance ---

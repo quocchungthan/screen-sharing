@@ -14,6 +14,7 @@ import {
 	toggleSharing,
 } from "../services/users";
 import { webrtcClient } from "../services/webrtc";
+import { socketClient } from "../services/socket-boundary";
 
 const Room: React.FC = () => {
 	const { roomId } = useParams<{ roomId: string }>();
@@ -33,6 +34,7 @@ const Room: React.FC = () => {
 			navigate("/");
 			return;
 		}
+		socketClient.enterRoom(roomId);
 
 		const initialize = async () => {
 			try {
