@@ -42,7 +42,7 @@ interface ParticipantItemProps {
 }
 
 const ParticipantItem: React.FC<ParticipantItemProps> = ({ participant, isCurrentUser }) => {
-  const { id, username, isMuted, isSharing } = participant;
+  const { username, isMuted, isSharing } = participant;
   
   return (
     <div className="participant border-b border-gray-700 last:border-b-0">
