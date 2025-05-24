@@ -2,6 +2,7 @@ import { socketClient, clientId } from "./socket-boundary";
 import { useUserStore } from "../store/userStore";
 import { Participant, useRoomStore } from "../store/roomStore";
 import { logCBT } from "./logger";
+import { webrtcClient } from "./webrtc";
 
 // Define event names
 const EVENTS = {
@@ -114,6 +115,10 @@ export function setupUserListeners() {
 				signal: null,
 			});
 			logCBT(`Added participant ${id} to room`);
+
+			// 💬 Initiate WebRTC connection
+			webrtcClient.connectToPeer(id);
+
 			// ✅ Send current participants to the new user
 			const participants = useRoomStore.getState().participants;
 			socketClient.emit<{
@@ -131,12 +136,17 @@ export function setupUserListeners() {
 			EVENTS.ROOM_PARTICIPANTS
 		)
 		.subscribe(({ targetClientId, participants }) => {
-			if (targetClientId !== clientId) return; // Ignore if not for this client
+			if (targetClientId !== clientId) return;
 			logCBT(`Received ROOM_PARTICIPANTS: ${JSON.stringify(participants)}`);
-
-			// Add participants to the room
 			useRoomStore.getState().setParticipants(participants);
-			logCBT(`Room store populated with existing participants`);
+
+			// ☎️ Initiate connection to all existing peers
+			participants.forEach((p) => {
+				if (p.id !== clientId) {
+					logCBT(`Connecting to existing peer ${p.id}`);
+					webrtcClient.connectToPeer(p.id);
+				}
+			});
 		});
 
 	socketClient
@@ -144,7 +154,7 @@ export function setupUserListeners() {
 		.subscribe(({ clientId: id }) => {
 			logCBT(`Received USER_LEFT from ${id}`);
 			useRoomStore.getState().removeParticipant(id);
-			logCBT(`Removed participant ${id} from room`);
+			webrtcClient.disconnectFromPeer(id);
 		});
 
 	socketClient
@@ -159,5 +169,39 @@ export function setupUserListeners() {
 		.subscribe(({ clientId: id, value }) => {
 			logCBT(`Received TOGGLE_SHARING from ${id}, value: ${value}`);
 			useRoomStore.getState().updateParticipant(id, { isSharing: value });
+		});
+
+	// ---- WebRTC Signaling ----
+
+	socketClient
+		.listen<{ from: string; offer: RTCSessionDescriptionInit }>("OFFER")
+		.subscribe(async ({ from, offer }) => {
+			logCBT(`Received OFFER from ${from}`);
+			const pc = webrtcClient.getPeer(from) || webrtcClient.connectToPeer(from);
+			await pc.setRemoteDescription(new RTCSessionDescription(offer));
+			const answer = await pc.createAnswer();
+			await pc.setLocalDescription(answer);
+			socketClient.emit("ANSWER", { to: from, answer });
+			logCBT(`Sent ANSWER to ${from}`);
+		});
+
+	socketClient
+		.listen<{ from: string; answer: RTCSessionDescriptionInit }>("ANSWER")
+		.subscribe(async ({ from, answer }) => {
+			logCBT(`Received ANSWER from ${from}`);
+			const pc = webrtcClient.getPeer(from);
+			if (pc) {
+				await pc.setRemoteDescription(new RTCSessionDescription(answer));
+			}
+		});
+
+	socketClient
+		.listen<{ from: string; candidate: RTCIceCandidateInit }>("ICE_CANDIDATE")
+		.subscribe(async ({ from, candidate }) => {
+			logCBT(`Received ICE_CANDIDATE from ${from}`);
+			const pc = webrtcClient.getPeer(from);
+			if (pc) {
+				await pc.addIceCandidate(new RTCIceCandidate(candidate));
+			}
 		});
 }
