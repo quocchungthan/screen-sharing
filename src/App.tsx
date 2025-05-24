@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Entry from './pages/Entry';
 import Room from './pages/Room';
+import AudioTest from './pages/AudioTest';
 import { useUserStore } from './store/userStore';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
             path="/room/:roomId" 
             element={username ? <Room /> : <Navigate to="/" replace />} 
           />
+          <Route path="/audio-test" element={<AudioTest />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { Monitor, Users, Play } from 'lucide-react';
+import { Monitor, Users, Play, Headphones } from 'lucide-react';
 import { useUserStore } from '../store/userStore';
 import { useRoomStore } from '../store/roomStore';
 
@@ -14,7 +14,6 @@ const Entry: React.FC = () => {
   const { setRoomId: storeSetRoomId } = useRoomStore();
   const navigate = useNavigate();
   
-  // Generate a room ID if creating a new room
   useEffect(() => {
     if (isCreating && !roomId) {
       setRoomId(uuidv4().substring(0, 8));
@@ -73,11 +72,6 @@ const Entry: React.FC = () => {
           <div className="flex space-x-4">
             <button
               type="button"
-			  style={{
-				justifyContent: "center",
-				alignItems: "center",
-				display: "flex"
-			  }}
               className={`flex-1 btn ${isCreating ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setIsCreating(true)}
             >
@@ -86,11 +80,6 @@ const Entry: React.FC = () => {
             </button>
             <button
               type="button"
-			  style={{
-				justifyContent: "center",
-				alignItems: "center",
-				display: "flex"
-			  }}
               className={`flex-1 btn ${!isCreating ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setIsCreating(false)}
             >
@@ -131,6 +120,17 @@ const Entry: React.FC = () => {
           <button type="submit" className="btn-primary w-full">
             {isCreating ? 'Create & Join' : 'Join Room'}
           </button>
+          
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => navigate('/audio-test')}
+              className="btn-secondary inline-flex items-center"
+            >
+              <Headphones size={18} className="mr-2" />
+              Test Audio Setup
+            </button>
+          </div>
         </form>
       </div>
     </div>
