@@ -72,7 +72,7 @@ const Entry: React.FC = () => {
           <div className="flex space-x-4">
             <button
               type="button"
-              className={`flex-1 btn ${isCreating ? 'btn-primary' : 'btn-secondary'}`}
+              className={`flex-1 inline-flex items-center justify-center btn ${isCreating ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setIsCreating(true)}
             >
               <Play size={18} className="mr-2" />
@@ -80,7 +80,7 @@ const Entry: React.FC = () => {
             </button>
             <button
               type="button"
-              className={`flex-1 btn ${!isCreating ? 'btn-primary' : 'btn-secondary'}`}
+              className={`flex-1 inline-flex items-center justify-center btn ${!isCreating ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setIsCreating(false)}
             >
               <Users size={18} className="mr-2" />
